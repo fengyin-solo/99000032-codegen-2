@@ -63,13 +63,21 @@ export const tagsApi = {
 
 // Import API
 export const importApi = {
-  importBookmarks: (file) => {
+  // Parse-only preview: no links/categories are written
+  previewBookmarks: (file) => {
     const formData = new FormData()
     formData.append('file', file)
-    return api.post('/import/bookmarks', formData, {
+    return api.post('/import/bookmarks/preview', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
+  // Commit selected items of a preview report
+  commitBookmarks: (reportId, { selected_ids, duplicate_action } = {}) =>
+    api.post(`/import/bookmarks/${reportId}/commit`, { selected_ids, duplicate_action }),
+  // Persisted import detail
+  getReports: () => api.get('/import/bookmarks/reports'),
+  getReport: (id) => api.get(`/import/bookmarks/reports/${id}`),
+  deleteReport: (id) => api.delete(`/import/bookmarks/reports/${id}`),
 }
 
 // Health Check API
