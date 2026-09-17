@@ -63,6 +63,7 @@ export const tagsApi = {
 
 // Import API
 export const importApi = {
+  // One-shot legacy import
   importBookmarks: (file) => {
     const formData = new FormData()
     formData.append('file', file)
@@ -70,6 +71,24 @@ export const importApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
+  // Step 1: parse file and get preview (no writes on the server)
+  previewBookmarks: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post('/import/preview', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000,
+    })
+  },
+  // Step 2: commit selected rows (each row is committed independently)
+  commitImport: (payload, signal) =>
+    api.post('/import/commit', payload, {
+      timeout: 600000,
+      signal,
+    }),
+  // Persisted import reports
+  getReports: () => api.get('/import/reports'),
+  getReport: (id) => api.get(`/import/reports/${id}`),
 }
 
 // Health Check API
